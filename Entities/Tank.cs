@@ -1,38 +1,32 @@
 using TanksGameProject.Map;
+using TanksGameProject.Renderer;
 namespace TanksGameProject.Entities
 {
-    public abstract class Tank
+    public abstract class Tank(int x, int y)
     {
         protected readonly int MoveCd
             = Settings.TankMoveCd, FireCd
             = Settings.TankFireCd;
-        public int X { get; protected set; }
-        public int Y { get; protected set; }
+        public int X { get; protected set; } = x;
+        public int Y { get; protected set; } = y;
         public int HP { get; protected set; } = 10;
         public Direction Facing { get; protected set; } = Direction.Up;
         protected DateTime lastMove = DateTime.MinValue, lastFire = DateTime.MinValue;
         public bool IsAlive => HP > 0;
-        public Map.GameMap Map { get; set; } = null!;
-        protected Tank(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
+        public GameMap Map { get; set; } = null!;
 
         protected bool TryMove(Direction d)
         {
             var now = DateTime.Now;
             if ((now - lastMove).TotalMilliseconds < MoveCd)
                 return false;
-            (int nx, int ny) = d switch
-            {
-                Direction.Up => (X, Y - 1),
-                Direction.Down => (X, Y + 1),
-                Direction.Left => (X - 1, Y),
-                Direction.Right => (X + 1, Y),
-                _ => (X, Y)
-            };
-            if (Map.IsWalkable(nx, ny))
+            var (dx, dy) = d.ToDelta();
+            int nx = X + dx, ny = Y + dy;
+            bool free = Map.Tanks.All(t => !t.IsAlive
+            || t == this
+            || t.X != nx
+            || t.Y != ny);
+            if (Map.IsWalkable(nx, ny) && free)
             {
                 X = nx;
                 Y = ny;
@@ -46,7 +40,7 @@ namespace TanksGameProject.Entities
             Facing = dir;
             TryMove(dir);
         }
-        public void Fire(Map.GameMap map)
+        public void Fire(GameMap map)
         {
             var now = DateTime.Now;
             if ((now - lastFire).TotalMilliseconds < FireCd)
@@ -55,7 +49,7 @@ namespace TanksGameProject.Entities
             lastFire = now;
         }
 
-        public virtual void Update(DateTime now, Map.GameMap m, IList<Tank> targets)
+        public virtual void Update(DateTime now, GameMap m, IList<Tank> targets)
         {
         }
 
@@ -81,13 +75,7 @@ namespace TanksGameProject.Entities
                 ? ConsoleColor.Green
                 : ConsoleColor.Red;
 
-            var glyph = GetGlyph();
-            for (int row = 0; row < Settings.CellPxH; row++)
-            {
-                Console.SetCursorPosition(X * Settings.CellPxW,
-                                          Y * Settings.CellPxH + row);
-                Console.Write(glyph[row]);
-            }
+            ConsoleRenderer.DrawSprite(X, Y, GetGlyph());
             Console.ResetColor();
         }
     }

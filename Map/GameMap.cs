@@ -7,16 +7,16 @@ namespace TanksGameProject.Map
         public readonly int Width;
         public readonly int Height;
         private readonly Cell[,] _cells;
-        private readonly List<Bullet> _bullets = new();
-        private readonly List<Tank> _tanks = new();
+        private readonly List<Bullet> _bullets = [];
+        private readonly List<Tank> _tanks = [];
 
-        public (int X, int Y) PlayerSpawn => (1, 1);
-        public List<(int X, int Y)> EnemySpawns => new()
-        { 
+        public static (int X, int Y) PlayerSpawn => (1, 1);
+        public List<(int X, int Y)> EnemySpawns =>
+        [
             (Width - 2, Height - 2),
             (Width - 2, 1),
-            (1, Height - 2) 
-        };
+            (1, Height - 2)
+        ];
 
         public int PixelWidth => Width * Settings.CellPxW;
         public int PixelHeight => Height * Settings.CellPxH;
@@ -34,7 +34,7 @@ namespace TanksGameProject.Map
         public bool InBounds(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
         public bool IsWalkable(int x, int y) => InBounds(x, y) && _cells[x, y].Type == CellType.Empty;
 
-        public void RegisterEntity(Tank t) 
+        public void RegisterEntity(Tank t)
         {
             t.Map = this;
             _tanks.Add(t);

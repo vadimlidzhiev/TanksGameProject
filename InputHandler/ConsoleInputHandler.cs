@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TanksGameProject.Entities;
+﻿using TanksGameProject.Entities;
 using TanksGameProject.Map;
 
 namespace TanksGameProject.InputHandler
 {
     public sealed class ConsoleInputHandler : IInputHandler
     {
-        public void Poll(PlayerTank p, Map.GameMap m)
+        public void Poll(PlayerTank p, GameMap m)
         {
             while (Console.KeyAvailable)
             {

@@ -1,17 +1,9 @@
 namespace TanksGameProject.Map
 {
-    public enum CellType { Empty, Wall, Water }
-
-    public class Cell
+    public class Cell(CellType type)
     {
-        public CellType Type { get; set; }
-        public int Health { get; set; }
-
-        public Cell(CellType type)
-        {
-            Type = type;
-            Health = type == CellType.Wall ? 3 : 0;
-        }
+        public CellType Type { get; set; } = type;
+        public int Health { get; set; } = type == CellType.Wall ? 3 : 0;
 
         public char GetGlyph()
         {

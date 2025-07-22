@@ -1,9 +1,6 @@
 namespace TanksGameProject.Entities
 {
-    public class PlayerTank : Tank
+    public class PlayerTank(int x, int y) : Tank(x, y)
     {
-        public PlayerTank(int x, int y) : base(x, y)
-        {
-        }
     }
 }

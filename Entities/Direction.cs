@@ -1,10 +1,10 @@
-namespace TanksGameProject.Entities 
+namespace TanksGameProject.Entities
 {
-    public enum Direction 
-    { 
-        Up, 
-        Down, 
-        Left, 
-        Right 
-    } 
+    public enum Direction
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
 }

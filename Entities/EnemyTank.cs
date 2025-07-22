@@ -11,14 +11,21 @@ namespace TanksGameProject.Entities
             HP = 5;
         }
 
-        public override void Update(DateTime now, Map.GameMap map, IList<Tank> targets)
+        public override void Update(DateTime now, GameMap map, IList<Tank> targets)
         {
             if (!IsAlive) return;
-            if (rnd.NextDouble() < 0.4)
+            if (!TryMove(Facing))
             {
-                var dir = (Direction)rnd.Next(4);
-                Facing = dir;
-                TryMove(dir);
+                for (int i = 0; i < 4; i++)
+                {
+                    Direction dir = (Direction)rnd.Next(4);
+                    if (dir == Facing) continue;
+                    if (TryMove(dir))
+                    {
+                        Facing = dir;
+                        break;
+                    }
+                }
             }
 
             var player = targets.FirstOrDefault(t => t is PlayerTank && t.IsAlive);
@@ -39,7 +46,7 @@ namespace TanksGameProject.Entities
             }
         }
 
-        private bool LineClear(Tank target, Map.GameMap map)
+        private bool LineClear(Tank target, GameMap map)
         {
             return map.ClearStraightPath((X, Y), (target.X, target.Y));
         }

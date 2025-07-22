@@ -11,6 +11,8 @@ namespace TanksGameProject.Game
         DateTime lastFrame = DateTime.MinValue;
         private readonly IInputHandler _input = new ConsoleInputHandler();
 
+        public IInputHandler Input => _input;
+
         public void Run()
         {
             for (int lvl = 1; lvl <= 10; lvl++)
@@ -39,28 +41,29 @@ namespace TanksGameProject.Game
                 if ((now - lastFrame).TotalMilliseconds < frameDelay) continue;
                 lastFrame = now;
 
-                _input.Poll(player, map);
-                player.Update(now, map, enemies.Cast<Tank>().ToList());
-                foreach (var e in enemies) e.Update(now, map, new List<Tank> { player });
+                Input.Poll(player, map);
+                player.Update(now, map, [.. enemies.Cast<Tank>()]);
+                foreach (var e in enemies) e.Update(now, map, [player]);
                 map.UpdateBullets(now);
                 map.CleanupProjectiles();
                 Draw(map, player, enemies, lvl);
                 Thread.Sleep(Settings.IdleSleep);
             }
-            if (!player.IsAlive) 
-            { 
-                Console.Clear(); 
+            if (!player.IsAlive)
+            {
+                Console.Clear();
                 Console.WriteLine("Вы проиграли!");
                 Console.ReadKey(true);
-                return false; }
+                return false;
+            }
             return true;
         }
 
 
-        void EnsureConsoleSize(Map.GameMap map)
+        static void EnsureConsoleSize(GameMap map)
         {
-            int needWidth = map.Width * Settings.CellPxW + 2;   
-            int needHeight = map.PixelHeight + 4;              
+            int needWidth = map.Width * Settings.CellPxW + 2;
+            int needHeight = map.PixelHeight + 4;
             if (Console.BufferWidth < needWidth || Console.BufferHeight < needHeight)
             {
                 Console.SetBufferSize(
@@ -72,12 +75,12 @@ namespace TanksGameProject.Game
             Console.SetWindowSize(winW, winH);
         }
 
-        void Draw(Map.GameMap map, PlayerTank player, List<EnemyTank> enemies, int lvl)
+        static void Draw(GameMap map, PlayerTank player, List<EnemyTank> enemies, int lvl)
         {
-            map.Draw(); 
+            map.Draw();
             player.Draw();
             enemies.ForEach(e => e.Draw());
-            Console.SetCursorPosition(0, map.PixelHeight); 
+            Console.SetCursorPosition(0, map.PixelHeight);
             Console.Write(
                 $"HP: {player.HP}  " +
                 $" Уровень: {lvl}   " +
